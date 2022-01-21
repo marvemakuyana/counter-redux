@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { incrementCounter, decrementCounter } from '../actions/counterActions';
 import { setTagline } from '../actions/headActions';
+import { getUserList } from '../asyncActions/userAsyncActions';
 
 class Content extends Component {
     constructor(props) {
@@ -11,11 +12,34 @@ class Content extends Component {
         }
     }
 
+    componentDidMount() {
+        this.props.getUserList();
+    }
+
     render() {
         const { tagline } = this.state;
-        const { incrementCounter, decrementCounter, counterObj, setTagline } = this.props;
+        const { incrementCounter, decrementCounter, counterObj, setTagline, userObj } = this.props;
         return (
             <div className="main">
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Avatar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {userObj.data && userObj.data.data.map((x, i) => <tr key={i}>
+                            <td>{x.first_name}</td>
+                            <td>{x.last_name}</td>
+                            <td>{x.email}</td>
+                            <td>< img src={x.avatar} width='40' height='40' /></td>
+                        </tr>)}
+                    </tbody>
+                </table>
                 <div style={{ marginBottom: 20 }}>
                     <h2>{counterObj.counterTitle}: {counterObj.count}</h2>
                     <input type='button' className='btn' style={{ marginRight: 10 }} value='+1' onClick={incrementCounter} />
@@ -45,14 +69,16 @@ class Content extends Component {
 const mapStateToProps = (state) => {
     return {
         counterObj: state.counter,
-        tagline: state.head.tagline
+        tagline: state.head.tagline,
+        userObj: state.user
     }
 }
 
 const mapDispatchToProps = {
     incrementCounter,
     decrementCounter,
-    setTagline
+    setTagline,
+    getUserList,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Content);
